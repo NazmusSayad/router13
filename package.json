@@ -1,21 +1,22 @@
 {
-	"devDependencies": {
-		"jspac": "^1.0.0",
-		"typescript": "^5.3.2"
-	},
-	"name": "router13",
-	"version": "0.0.0",
-	"scripts": {
-		"dev": "jspac dev",
-		"build": "jspac build"
-	},
-	"main": "./dist-cjs/index.cjs",
-	"module": "./dist-mjs/index.mjs",
-	"exports": {
-		".": {
-			"require": "./dist-cjs/index.cjs",
-			"import": "./dist-mjs/index.mjs",
-			"types": "./dist-mjs/index.d.mts"
-		}
-	}
+  "devDependencies": {
+    "jspac": "^1.0.0",
+    "typescript": "^5.3.2"
+  },
+  "name": "router13",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "jspac dev",
+    "build": "jspac build",
+    "lab": "nodemon ./src/_lab.ts"
+  },
+  "main": "./dist-cjs/index.cjs",
+  "module": "./dist-mjs/index.mjs",
+  "exports": {
+    ".": {
+      "require": "./dist-cjs/index.cjs",
+      "import": "./dist-mjs/index.mjs",
+      "types": "./dist-mjs/index.d.mts"
+    }
+  }
 }

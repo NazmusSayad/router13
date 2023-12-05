@@ -11,15 +11,16 @@ export default function createRouter(options: Options = {}) {
           ...internalArgs,
           (err: any) => {
             if (err) throw err
-            run(...internalArgs)
+            return run(...internalArgs)
           },
         ]
 
         const currentFn = handlers[index++]
         const returnedValue = currentFn?.(...internalArgsWithNext)
         if (returnedValue instanceof Promise) await returnedValue
+        return returnedValue
       } catch (err: any) {
-        currentOptions.errorHandler?.(err, ...internalArgs)
+        return currentOptions.errorHandler?.(err, ...internalArgs)
       }
     }
 

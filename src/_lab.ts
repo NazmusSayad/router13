@@ -4,6 +4,7 @@ import router from './index'
 const router2 = router.create({
   middleware: [
     (req: any, res: any, next: any) => {
+      return "100"
       console.log('Init: 1')
       next()
     },
@@ -43,4 +44,4 @@ const callback = router3(
   }
 )
 
-callback('REQ', 'RES')
+console.log(callback('REQ', 'RES'))
