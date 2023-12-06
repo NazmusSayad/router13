@@ -1,44 +1,50 @@
 console.clear()
 import router from './index'
 
-const router2 = router.create({
+const router2 = router.create<
+  (req: string, res: number, next: Function) => any
+>({
   middleware: [
-    (req: any, res: any, next: any) => {
-      return "100"
+    (req, res, next) => {
+      return '100'
       console.log('Init: 1')
       next()
     },
-    (req: any, res: any, next: any) => {
+    (req, res, next) => {
       console.log('Init: 2')
       next()
     },
   ],
+
+  errorHandler: (err, req, res, next) => {
+    console.log('ERROR:', err)
+    next()
+  },
 })
 
 const router3 = router2.create({
   middleware: [
-    (req: any, res: any, next: any) => {
+    (req, res, next) => {
       console.log('After: 1')
       next()
     },
   ],
 
-  errorHandler: (...args: any[]) => {
+  errorHandler: (...args) => {
     console.log('ERROR:', args)
   },
 })
 
 const callback = router3(
-  async (req: any, res: any, next: any) => {
+  async (req, res, next) => {
     console.log(1, req, res, next)
     next()
-    // next(new Error('ERROR'))
   },
-  (req: any, res: any, next: any) => {
+  (req, res, next) => {
     console.log(2, req, res, next)
     next()
   },
-  (req: any, res: any, next: any) => {
+  (req, res, next) => {
     console.log(3, req, res, next)
     next()
   }

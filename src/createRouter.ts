@@ -1,7 +1,9 @@
-export default function createRouter(options: Options = {}) {
+export default function createRouter<TRootParent extends Function>(
+  options: Options<TRootParent> = {}
+) {
   const currentOptions = { ...options }
 
-  function router(...args: Function[]) {
+  function router<T>(...args: (T extends Function ? T : TRootParent)[]) {
     const handlers = [...(currentOptions.middleware ?? []), ...args]
     let index = 0
 
@@ -15,33 +17,41 @@ export default function createRouter(options: Options = {}) {
           },
         ]
 
-        const currentFn = handlers[index++]
+        const currentFn = handlers[index++] as TRootParent
         const returnedValue = currentFn?.(...internalArgsWithNext)
         if (returnedValue instanceof Promise) await returnedValue
         return returnedValue
       } catch (err: any) {
-        return currentOptions.errorHandler?.(err, ...internalArgs)
+        return currentOptions.errorHandler?.(err, ...(internalArgs as any))
       }
     }
 
-    return run
+    return function (...args: any[]) {
+      index = 0
+      return run(...args)
+    }
   }
 
-  router.create = function (options: Options = {}) {
-    return createRouter({
+  router.create = function <TRoot extends TRootParent>(
+    options: Options<TRoot> = {}
+  ) {
+    return createRouter<TRoot>({
       ...currentOptions,
       ...options,
       middleware: [
         ...(currentOptions.middleware ?? []),
         ...(options.middleware ?? []),
       ],
-    })
+    } as Options<TRoot>)
   }
 
   return router
 }
 
-export type Options = {
-  middleware?: Function[]
-  errorHandler?: Function
+export type Options<T = Function> = {
+  middleware?: T[]
+  errorHandler?: (
+    err: any,
+    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
+  ) => any
 }
