@@ -10,10 +10,6 @@ const router2 = router.create<
       console.log('Init: 1')
       next()
     },
-    (req, res, next) => {
-      console.log('Init: 2')
-      next()
-    },
   ],
 
   errorHandler: (err, req, res, next) => {
@@ -22,7 +18,9 @@ const router2 = router.create<
   },
 })
 
-const router3 = router2.create({
+const router3 = router2.create<
+  (req: string, res: string, next: Function) => any
+>({
   middleware: [
     (req, res, next) => {
       console.log('After: 1')

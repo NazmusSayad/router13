@@ -32,7 +32,7 @@ export default function createRouter<TRootParent extends Function>(
     }
   }
 
-  router.create = function <TRoot extends TRootParent>(
+  router.create = function <TRoot extends Function = TRootParent>(
     options: Options<TRoot> = {}
   ) {
     return createRouter<TRoot>({
@@ -48,6 +48,8 @@ export default function createRouter<TRootParent extends Function>(
   return router
 }
 
+export type Handler = Function
+export type NextFunction = (err?: any) => any
 export type Options<T = Function> = {
   middleware?: T[]
   errorHandler?: (
