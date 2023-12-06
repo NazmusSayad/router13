@@ -1,9 +1,11 @@
-export default function createRouter<TRootParent extends Function>(
+import { Handler, Options } from "./types"
+
+export default function createRouter<TRootParent extends Handler>(
   options: Options<TRootParent> = {}
 ) {
   const currentOptions = { ...options }
 
-  function router<T>(...args: (T extends Function ? T : TRootParent)[]) {
+  function router<T>(...args: (T extends Handler ? T : TRootParent)[]) {
     const handlers = [...(currentOptions.middleware ?? []), ...args]
     let index = 0
 
@@ -32,7 +34,7 @@ export default function createRouter<TRootParent extends Function>(
     }
   }
 
-  router.create = function <TRoot extends Function = TRootParent>(
+  router.create = function <TRoot extends Handler = TRootParent>(
     options: Options<TRoot> = {}
   ) {
     return createRouter<TRoot>({
@@ -46,14 +48,4 @@ export default function createRouter<TRootParent extends Function>(
   }
 
   return router
-}
-
-export type Handler = Function
-export type NextFunction = (err?: any) => any
-export type Options<T = Function> = {
-  middleware?: T[]
-  errorHandler?: (
-    err: any,
-    ...args: T extends (...args: any) => any ? Parameters<T> : any[]
-  ) => any
 }
