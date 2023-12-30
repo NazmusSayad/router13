@@ -1,12 +1,12 @@
-import { Handler, Options } from "./types"
+import { ErrorHandler, Handler, Options, Middleware } from './types'
 
 export default function createRouter<TRootParent extends Handler>(
   options: Options<TRootParent> = {}
 ) {
-  const currentOptions = { ...options }
+  const oldOptions = { ...options }
 
-  function router<T>(...args: (T extends Handler ? T : TRootParent)[]) {
-    const handlers = [...(currentOptions.middleware ?? []), ...args]
+  function router<T extends Handler = TRootParent>(...args: T[]) {
+    const handlers = [...(oldOptions.middleware ?? []), ...args]
     let index = 0
 
     async function run(...internalArgs: any[]) {
@@ -24,7 +24,7 @@ export default function createRouter<TRootParent extends Handler>(
         if (returnedValue instanceof Promise) await returnedValue
         return returnedValue
       } catch (err: any) {
-        return currentOptions.errorHandler?.(err, ...(internalArgs as any))
+        return oldOptions.onError?.(err, ...(internalArgs as any))
       }
     }
 
@@ -34,17 +34,20 @@ export default function createRouter<TRootParent extends Handler>(
     }
   }
 
-  router.create = function <TRoot extends Handler = TRootParent>(
-    options: Options<TRoot> = {}
+  router.use = function <TRoot extends Handler = TRootParent>(
+    ...args: Middleware<TRoot>[]
   ) {
     return createRouter<TRoot>({
-      ...currentOptions,
-      ...options,
-      middleware: [
-        ...(currentOptions.middleware ?? []),
-        ...(options.middleware ?? []),
-      ],
+      ...oldOptions,
+      middleware: [...(oldOptions.middleware ?? []), ...args],
     } as Options<TRoot>)
+  }
+
+  router.onError = function (onError: ErrorHandler<TRootParent>) {
+    return createRouter({
+      ...oldOptions,
+      onError: onError,
+    })
   }
 
   return router
